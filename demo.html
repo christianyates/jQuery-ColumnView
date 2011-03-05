@@ -587,6 +587,96 @@
   </ul>
   Current Item: <div style="border:1px solid green" id="thecurrent">&nbsp;</div>
   
+  <h1 id="nopreview">Don't show any preview pane at all</h1>
+  <p>You may not want to show a preview pane at all, so now you can with <code>preview:false</code>.</p>
+  <pre>
+    $('#demo7').columnview({
+      preview: false
+    });      
+  </pre>
+  <ul class="menu" id="demo7">
+  
+  <li class="expanded"><a href="#">Create content</a><br /> 
+  <ul class="menu"> 
+  <li class="leaf"><a href="#">Map</a></li> 
+  <li class="leaf"><a href="#">Page</a></li> 
+  <li class="leaf"><a href="#">Story</a></li> 
+  </ul> 
+  </li> 
+  <li class="leaf"><a href="#">Database queries</a></li> 
+  <li class="leaf"><a href="#">Filebrowser</a></li> 
+  <li class="leaf"><a href="#">Recent posts</a></li> 
+  <li class="leaf"><a href="#">My account</a></li> 
+  <li class="expanded"><a href="#">Administer</a><br /> 
+  <ul class="menu"> 
+  <li class="expanded"><a href="#" title="Manage your site's content.">Content management</a><br /> 
+  <ul class="menu"> 
+  <li class="leaf"><a href="#" title="Create vocabularies and terms to categorize your content.">Categories</a></li> 
+  <li class="leaf"><a href="#" title="List and edit site comments and the comment moderation queue.">Comments</a></li> 
+  <li class="leaf"><a href="#" title="View, edit, and delete your site's content.">Content</a></li> 
+  <li class="leaf"><a href="#" title="Manage posts by content type, including default status, front page promotion, etc.">Content types</a></li> 
+  <li class="leaf"><a href="#" title="Control posting behavior, such as teaser length, requiring previews before posting, and the number of posts on the front page.">Post settings</a></li> 
+  <li class="leaf"><a href="#" title="Configure the number of items per feed and whether feeds should be titles/teasers/full-text.">RSS publishing</a></li> 
+  <li class="leaf"><a href="#" title="View all signup-enabled posts, and open or close signups on them.">Signup administration</a></li> 
+  </ul> 
+  </li> 
+  <li class="expanded"><a href="#" title="Control how your site looks and feels.">Site building</a><br /> 
+  <ul class="menu"> 
+  <li class="leaf"><a href="#" title="Configure what block content appears in your site's sidebars and other regions.">Blocks</a></li> 
+  <li class="leaf"><a href="#" title="Control your site's navigation menu, primary links and secondary links. as well as rename and reorganize menu items.">Menus</a></li> 
+  <li class="leaf"><a href="#" title="Configure page titles and intro text for menu tree pages.">Menu trees</a></li> 
+  <li class="leaf"><a href="#" title="Enable or disable add-on modules for your site.">Modules</a></li> 
+  <li class="leaf"><a href="#" title="Change which theme your site uses or allows users to set.">Themes</a></li> 
+  <li class="leaf"><a href="#" title="Change your site's URL paths by aliasing them.">URL aliases</a></li> 
+  <li class="leaf"><a href="#" title="Views are customized lists of content on your system; they are highly configurable and give you control over how lists of content are presented.">Views</a></li> 
+  </ul> 
+  </li> 
+  <li class="expanded"><a href="#" title="Adjust basic site configuration options.">Site configuration</a><br /> 
+  <ul class="menu"> 
+  <li class="leaf"><a href="#" title="Settings for how your administrative pages should look.">Administration theme</a></li> 
+  <li class="leaf"><a href="#" title="Enable or disable clean URLs for your site.">Clean URLs</a></li> 
+  <li class="leaf"><a href="#" title="Settings for how Drupal displays date and time, as well as the system's default timezone.">Date and time</a></li> 
+  <li class="leaf"><a href="#">Devel</a></li> 
+  <li class="leaf"><a href="#" title="Control how Drupal deals with errors including 403/404 errors as well as PHP error reporting.">Error reporting</a></li> 
+  <li class="leaf"><a href="#" title="Set filebrowser root folder and display properties.">Filebrowser</a></li> 
+  <li class="leaf"><a href="#" title="Tell Drupal where to store uploaded files and how they are accessed.">File system</a></li> 
+  <li class="leaf"><a href="#" title="Choose which image toolkit to use if you have installed optional toolkits.">Image toolkit</a></li> 
+  <li class="leaf"><a href="#" title="Configure how content input by users is filtered, including allowed HTML tags, PHP code tags. Also allows enabling of module-provided filters.">Input formats</a></li> 
+  <li class="leaf"><a href="#" title="Configure settings for jQuery UI module.">jQuery UI</a></li> 
+  <li class="leaf"><a href="#" title="Allows the user to configure the lightbox2 settings">Lightbox2</a></li> 
+  <li class="leaf"><a href="#">Mars Space Flight Facility Image Tool</a></li> 
+  <li class="leaf"><a href="#" title="Enable or disable page caching for anonymous users, and enable or disable CSS preprocessor.">Performance</a></li> 
+  <li class="leaf"><a href="#" title="Configuration options for MSFF Planetary Data Viewer">Planet Viewer</a></li> 
+  <li class="leaf"><a href="#" title="Configure settings for signups.">Signup</a></li> 
+  <li class="leaf"><a href="#" title="Select the menu to display.">SimpleMenu</a></li> 
+  <li class="leaf"><a href="#" title="Change basic site information, such as the site name, slogan, e-mail address, mission, front page and more.">Site information</a></li> 
+  <li class="leaf"><a href="#" title="Take the site off-line for maintenance or bring it back online.">Site maintenance</a></li> 
+  </ul> 
+  </li> 
+  <li class="expanded"><a href="#" title="Manage your site's users, groups and access to site features.">User management</a><br /> 
+  <ul class="menu"> 
+  <li class="leaf"><a href="#" title="Determine access to features by selecting permissions for roles.">Access control</a></li> 
+  <li class="leaf"><a href="#" title="List and create rules to disallow usernames, e-mail addresses, and IP addresses.">Access rules</a></li> 
+  <li class="leaf"><a href="#" title="List, edit, or add user roles.">Roles</a></li> 
+  <li class="leaf"><a href="#" title="List, add, and edit users.">Users</a></li> 
+  <li class="leaf"><a href="#" title="Configure default behavior of users, including registration requirements, e-mails, and user pictures.">User settings</a></li> 
+  </ul> 
+  </li> 
+  <li class="expanded"><a href="#" title="View system logs and other status information.">Logs</a><br /> 
+  <ul class="menu"> 
+  <li class="leaf"><a href="#" title="View events that have recently been logged.">Recent log entries</a></li> 
+  <li class="leaf"><a href="#" title="View 'access denied' errors (403s).">Top 'access denied' errors</a></li> 
+  <li class="leaf"><a href="#" title="View 'page not found' errors (404s).">Top 'page not found' errors</a></li> 
+  <li class="leaf"><a href="#" title="Get a status report about your site's operation and any detected problems.">Status report</a></li> 
+  </ul> 
+  </li> 
+  <li class="leaf"><a href="#">Help</a></li> 
+  </ul> 
+  </li> 
+  <li class="leaf"><a href="#">Log out</a></li> 
+  </ul>
+  
+  <!-- The actual scripts -->
   <script type="text/javascript" charset="utf-8">
     $(document).ready(function(){
       $('#demo1').columnview();
@@ -606,7 +696,10 @@
         onchange: function(element) {
           $("#thecurrent").text($(element).text());
         }
-      });      
+      });
+      $('#demo7').columnview({
+        preview:false
+      });
     });
   </script>
 
