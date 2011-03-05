@@ -151,20 +151,27 @@
           else if (!event.metaKey && !event.shiftKey) {
             // No children, show title instead (if it exists, or a link)
             isleafnode = true;
-            var title = $('<a/>').attr({href:$(self).attr('href')}).text($(self).attr('title') ? $(self).attr('title') : $(self).text());
-            var featurebox = $('<div/>').html(title).addClass('feature').appendTo(container);
+            var previewcontainer = $('<div/>').addClass('feature').appendTo(container);
             // Fire preview handler function
             if ($.isFunction(settings.preview)) {
               // We're passing the element back to the callback
               var preview = settings.preview($(self));
             }
+            // If preview is specifically disabled, do nothing with the previewbox
+            else if (!settings.preview) {
+            }
+            // If no preview function is specificied, use a default behavior
+            else {
+              var title = $('<a/>').attr({href:$(self).attr('href')}).text($(self).attr('title') ? $(self).attr('title') : $(self).text());
+              $(previewcontainer).html(title);
+            }
             // Set the width
-            var remainingspace = 0;
+            var remainingspace = 0; 
             $.each($(container).children('div').slice(0,-1),function(i,item){
               remainingspace += $(item).width();
             });
             var fillwidth = $(container).width() - remainingspace;
-            $(featurebox).css({'top':0,'left':remainingspace}).width(fillwidth).show();  
+            $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();  
           }
           // Fire onchange handler function, but only if multi-select is off.
           // FIXME Need to deal multiple selections.
@@ -203,7 +210,7 @@
   
   $.fn.columnview.defaults = {
     multi: false,     // Allow multiple selections
-    preview: false,   // Handler for preview pane
+    preview: true,    // Handler for preview pane
     fixedwidth: false,// Use fixed width columns
     onchange: false   // Handler for selection change
   };
