@@ -605,6 +605,7 @@
       $('#demo6').columnview({
         onchange: function(element) {
           $("#thecurrent").text($(element).text());
+          $('#demo6').animate({scrollLeft: 280}, 'slow');
         }
       });      
     });
