@@ -133,13 +133,27 @@
         var fillwidth = $(container).width() - remainingspace;
         $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();  
       }
+
       // Fire onchange handler function, but only if multi-select is off.
       // FIXME Need to deal multiple selections.
       if ($.isFunction(settings.onchange) && !settings.multi) {
         // We're passing the element back to the callback
         var onchange = settings.onchange($(self), isleafnode);
       }
+    },
+
+    navigateTo: function (key, attrName) {
+      if (!attrName) {
+        attrName = "name";
+      }
+
+      var origLinks = origElt.find("[" + attrName + "=" + key + "]").parentsUntil(origElt).filter("li").find(":eq(0)");
+      var keys = origLinks.map(function (i, elt) { return $(elt).attr(attrName); }).toArray().reverse();
       
+      $.each(keys, function (i, elt) {
+        var entry = container.find("[" + attrName + "=" + elt + "]");
+        methods.handleClick(entry);
+      });
     },      
 
     // Event handling functions
