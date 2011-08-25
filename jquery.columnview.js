@@ -7,18 +7,18 @@
  *
  * Supported under jQuery 1.2.x or later
  * Keyboard navigation supported under 1.3.x or later
- * 
+ *
  * Dual licensed under MIT and GPL.
  */
 
 (function($){
   var defaults = {
-    multi      : false, // Allow multiple selections
-    preview    : true,  // Handler for preview pane
-    fixedwidth : false, // Use fixed width columns
-    onchange   : false,  // Handler for selection change
-    addCSS     : true,
-    useCanvas  : true
+    multi:      false, // Allow multiple selections
+    preview:    true,  // Handler for preview pane
+    fixedwidth: false, // Use fixed width columns
+    onchange:   false, // Handler for selection change
+    addCSS:     true,
+    useCanvas:  true
   };
 
   var settings;
@@ -26,7 +26,7 @@
   // Firefox doesn't repeat keydown events when the key is held, so we use
   // keypress with FF/Gecko/Mozilla to enable continuous keyboard scrolling.
   var key_event = $.browser.mozilla ? 'keypress' : 'keydown';
-  
+
   /* keep a reference to the container object in order to navigate from root */
   var container;
   var origElt;
@@ -38,7 +38,7 @@
       if (settings.addCSS) {
         addCSS();
       }
-      
+
       // Hide original list
       $(this).hide();
       // Reset the original list's id
@@ -51,9 +51,9 @@
       origElt = $(this);
 
       // Create new top container from top-level LI tags
-      var top = $(this).children('li');
+      var top       = $(this).children('li');
       container = $('<div/>').addClass('containerobj').attr('id', origid).insertAfter(this);
-      var topdiv = $('<div class="top"></div>').appendTo(container);
+      var topdiv    = $('<div class="top"></div>').appendTo(container);
 
       // Set column width
       if (settings.fixedwidth || $.browser.msie) { // MSIE doesn't support auto-width
@@ -61,7 +61,7 @@
         $('.top').width(width);
       }
 
-      $.each(top,function(i,item){
+      $.each(top,function(i, item){
         var topitem = $(':eq(0)',item).clone(true).wrapInner("<span/>").
           data('sub',$(item).children('ul'))
           .appendTo(topdiv);
@@ -79,7 +79,7 @@
 
     handleClick: function (self, shiftKey, metaKey) {
       $(self).focus();
-      
+
       var level = $('div',container).index($(self).parents('div'));
       var isleafnode = false;
       // Remove blocks to the right in the tree, and 'deactivate' other
@@ -88,7 +88,7 @@
       if (!metaKey && !shiftKey) {
         $('div:eq('+level+') a',container).removeClass('active')
           .removeClass('inpath');
-        $('.active',container).addClass('inpath');
+        $('.active',container)            .addClass('inpath');
         $('div:lt('+level+') a',container).removeClass('active');
       }
 
@@ -126,12 +126,12 @@
           $(previewcontainer).html(title);
         }
         // Set the width
-        var remainingspace = 0; 
+        var remainingspace = 0;
         $.each($(container).children('div').slice(0,-1),function(i,item){
           remainingspace += $(item).width();
         });
         var fillwidth = $(container).width() - remainingspace;
-        $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();  
+        $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();
       }
 
       // Fire onchange handler function, but only if multi-select is off.
@@ -149,13 +149,13 @@
 
       var origLinks = origElt.find("[" + attrName + "=" + key + "]").parentsUntil(origElt).filter("li").find(":eq(0)");
       var keys = origLinks.map(function (i, elt) { return $(elt).attr(attrName); }).toArray().reverse();
-      
+
       $.each(keys, function (i, elt) {
         var entry = container.find("[" + attrName + "=" + elt + "]");
         methods.handleClick(entry);
       });
-    },      
-
+    },
+    
     // Event handling functions
     handleEvent: function (event) {
       if ($(event.target).is("a,span")) {
@@ -163,21 +163,21 @@
           var self = $(event.target).parent();
         }
         else {
-          var self = event.target;          
+          var self = event.target;
         }
-        
+
         if (!settings.multi) {
           delete event.shiftKey;
           delete event.metaKey;
         }
-        
+
         self.focus();
-        
+
         // Handle clicks
         if (event.type == "click") {
           methods.handleClick(self, event.shiftKey, event.metaKey);
         }
-        
+
         // Handle Keyboard navigation
         if(event.type == key_event){
           switch(event.keyCode){
@@ -206,7 +206,7 @@
     }
   };
 
-  
+
   $.fn.columnview = function(method) {
     if ( methods[method] ) {
       return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
@@ -214,11 +214,11 @@
       return methods.init.apply( this, arguments );
     } else {
       $.error( 'Method ' +  method + ' does not exist on jQuery.columnview ');
-    }    
+    }
   };
 
   // Generate deeper level menus
-  function submenu(container,item,width){
+  function submenu(container, item, width){
     var leftPos = 0;
     $.each($(container).children('div'),function(i,mydiv){
       leftPos += $(mydiv).width();
@@ -242,7 +242,7 @@
                            '-o-text-overflow':  'ellipsis',
                            '-ms-text-overflow': 'ellipsis'} );
       }
-      if($(subsubitem).data('sub').length) {
+      if ($(subsubitem).data('sub').length) {
         $(subsubitem).addClass('hasChildMenu');
         addWidget(subsubitem);
       }
@@ -252,7 +252,7 @@
   // Uses canvas, if available, to draw a triangle to denote that item is a parent
   function addWidget(item, color){
     var useCss = false;
-    
+
     if (!settings.useCanvas) {
       useCss = true;
     } else {
@@ -346,5 +346,5 @@
       </style>');
     }
   }
-    
+
 })(jQuery);
