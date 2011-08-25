@@ -12,6 +12,15 @@
  */
 
 (function($){
+  var defaults = {
+    multi      : false, // Allow multiple selections
+    preview    : true,  // Handler for preview pane
+    fixedwidth : false, // Use fixed width columns
+    onchange   : false,  // Handler for selection change
+    addCSS     : true,
+    useCanvas  : true
+  };
+
   var settings;
 
 
@@ -21,8 +30,11 @@
   
   var methods = {
     init: function (options) {
-      settings = $.extend({}, $.fn.columnview.defaults, options);
+      settings = $.extend({}, defaults, options);
+
+      if (settings.addCSS) {
         addCSS();
+      }
 
       // Hide original list
       $(this).hide();
@@ -175,13 +187,6 @@
     }    
   };
 
-  $.fn.columnview.defaults = {
-    multi: false,     // Allow multiple selections
-    preview: true,    // Handler for preview pane
-    fixedwidth: false,// Use fixed width columns
-    onchange: false   // Handler for selection change
-  };
-
   // Generate deeper level menus
   function submenu(container,item,width){
     var leftPos = 0;
@@ -206,6 +211,11 @@
 
   // Uses canvas, if available, to draw a triangle to denote that item is a parent
   function addWidget(item, color){
+    var useCss = false;
+    
+    if (!settings.useCanvas) {
+      useCss = true;
+    } else {
     var triheight = $(item).height();
     var canvas = $("<canvas></canvas>").attr({height:triheight,width:10}).addClass('widget').appendTo(item);    if(!color){ color = $(canvas).css('color'); }
     canvas = $(canvas).get(0);
@@ -218,6 +228,11 @@
       context.lineTo(3,(triheight/2 + 3));
       context.fill();
     } else {
+        useCss = true;
+      }
+    }
+
+    if (useCss) {
       /**
        * Canvas not supported - put something in there anyway that can be
        * suppressed later if desired. We're using a decimal character here
