@@ -35,7 +35,7 @@
       if (settings.addCSS) {
         addCSS();
       }
-
+      
       // Hide original list
       $(this).hide();
       // Reset the original list's id
@@ -66,6 +66,69 @@
       $(container).bind("click " + key_event, methods.handleEvent);
     },
 
+    handleClick: function (event, self) {
+      var container = $(self).parents('.containerobj');
+      
+      var level = $('div',container).index($(self).parents('div'));
+      var isleafnode = false;
+      // Remove blocks to the right in the tree, and 'deactivate' other
+      // links within the same level, if metakey is not being used
+      $('div:gt('+level+')',container).remove();
+      if (!event.metaKey && !event.shiftKey) {
+        $('div:eq('+level+') a',container).removeClass('active').removeClass('inpath');
+        $('.active',container).addClass('inpath');
+        $('div:lt('+level+') a',container).removeClass('active');
+      }
+      // Select intermediate items when shift clicking
+      // Sorry, only works with jQuery 1.4 due to changes in the .index() function
+      if (event.shiftKey) {
+        var first = $('a.active:first', $(self).parent()).index();
+        var cur = $(self).index();
+        var range = [first,cur].sort(function(a,b){return a - b;});
+        $('div:eq('+level+') a', container).slice(range[0], range[1]).addClass('active');
+      }
+      $(self).addClass('active');
+      if ($(self).data('sub').children('li').length && !event.metaKey) {
+        // Menu has children, so add another submenu
+        var w = false;
+        if (settings.fixedwidth || $.browser.msie)
+          w = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
+        submenu(container,self,w);
+      }
+      else if (!event.metaKey && !event.shiftKey) {
+        // No children, show title instead (if it exists, or a link)
+        isleafnode = true;
+        var previewcontainer = $('<div/>').addClass('feature').appendTo(container);
+        // Fire preview handler function
+        if ($.isFunction(settings.preview)) {
+          // We're passing the element back to the callback
+          var preview = settings.preview($(self));
+        }
+        // If preview is specifically disabled, do nothing with the previewbox
+        else if (!settings.preview) {
+        }
+        // If no preview function is specificied, use a default behavior
+        else {
+          var title = $('<a/>').attr({href:$(self).attr('href')}).text($(self).attr('title') ? $(self).attr('title') : $(self).text());
+          $(previewcontainer).html(title);
+        }
+        // Set the width
+        var remainingspace = 0; 
+        $.each($(container).children('div').slice(0,-1),function(i,item){
+          remainingspace += $(item).width();
+        });
+        var fillwidth = $(container).width() - remainingspace;
+        $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();  
+      }
+      // Fire onchange handler function, but only if multi-select is off.
+      // FIXME Need to deal multiple selections.
+      if ($.isFunction(settings.onchange) && !settings.multi) {
+        // We're passing the element back to the callback
+        var onchange = settings.onchange($(self), isleafnode);
+      }
+      
+    },      
+
     // Event handling functions
     handleEvent: function (event) {
       if ($(event.target).is("a,span")) {
@@ -80,68 +143,14 @@
           delete event.shiftKey;
           delete event.metaKey;
         }
+        
         self.focus();
-        var container = $(self).parents('.containerobj');
+        
         // Handle clicks
         if (event.type == "click") {
-          var level = $('div',container).index($(self).parents('div'));
-          var isleafnode = false;
-          // Remove blocks to the right in the tree, and 'deactivate' other
-          // links within the same level, if metakey is not being used
-          $('div:gt('+level+')',container).remove();
-          if (!event.metaKey && !event.shiftKey) {
-            $('div:eq('+level+') a',container).removeClass('active').removeClass('inpath');
-            $('.active',container).addClass('inpath');
-            $('div:lt('+level+') a',container).removeClass('active');
-          }
-          // Select intermediate items when shift clicking
-          // Sorry, only works with jQuery 1.4 due to changes in the .index() function
-          if (event.shiftKey) {
-            var first = $('a.active:first', $(self).parent()).index();
-            var cur = $(self).index();
-            var range = [first,cur].sort(function(a,b){return a - b;});
-            $('div:eq('+level+') a', container).slice(range[0], range[1]).addClass('active');
-          }
-          $(self).addClass('active');
-          if ($(self).data('sub').children('li').length && !event.metaKey) {
-            // Menu has children, so add another submenu
-            var w = false;
-            if (settings.fixedwidth || $.browser.msie)
-              w = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
-            submenu(container,self,w);
-          }
-          else if (!event.metaKey && !event.shiftKey) {
-            // No children, show title instead (if it exists, or a link)
-            isleafnode = true;
-            var previewcontainer = $('<div/>').addClass('feature').appendTo(container);
-            // Fire preview handler function
-            if ($.isFunction(settings.preview)) {
-              // We're passing the element back to the callback
-              var preview = settings.preview($(self));
-            }
-            // If preview is specifically disabled, do nothing with the previewbox
-            else if (!settings.preview) {
-            }
-            // If no preview function is specificied, use a default behavior
-            else {
-              var title = $('<a/>').attr({href:$(self).attr('href')}).text($(self).attr('title') ? $(self).attr('title') : $(self).text());
-              $(previewcontainer).html(title);
-            }
-            // Set the width
-            var remainingspace = 0; 
-            $.each($(container).children('div').slice(0,-1),function(i,item){
-              remainingspace += $(item).width();
-            });
-            var fillwidth = $(container).width() - remainingspace;
-            $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();  
-          }
-          // Fire onchange handler function, but only if multi-select is off.
-          // FIXME Need to deal multiple selections.
-          if ($.isFunction(settings.onchange) && !settings.multi) {
-            // We're passing the element back to the callback
-            var onchange = settings.onchange($(self), isleafnode);
-          }
+          methods.handleClick(event, self);
         }
+        
         // Handle Keyboard navigation
         if(event.type == key_event){
           switch(event.keyCode){
@@ -216,18 +225,18 @@
     if (!settings.useCanvas) {
       useCss = true;
     } else {
-    var triheight = $(item).height();
-    var canvas = $("<canvas></canvas>").attr({height:triheight,width:10}).addClass('widget').appendTo(item);    if(!color){ color = $(canvas).css('color'); }
-    canvas = $(canvas).get(0);
-    if(canvas.getContext){
-      var context = canvas.getContext('2d');
-      context.fillStyle = color;
-      context.beginPath();
-      context.moveTo(3,(triheight/2 - 3));
-      context.lineTo(10,(triheight/2));
-      context.lineTo(3,(triheight/2 + 3));
-      context.fill();
-    } else {
+      var triheight = $(item).height();
+      var canvas = $("<canvas></canvas>").attr({height:triheight,width:10}).addClass('widget').appendTo(item);    if(!color){ color = $(canvas).css('color'); }
+      canvas = $(canvas).get(0);
+      if (canvas.getContext){
+        var context = canvas.getContext('2d');
+        context.fillStyle = color;
+        context.beginPath();
+        context.moveTo(3,(triheight/2 - 3));
+        context.lineTo(10,(triheight/2));
+        context.lineTo(3,(triheight/2 + 3));
+        context.fill();
+      } else {
         useCss = true;
       }
     }
@@ -239,7 +248,7 @@
        * representing a "black right-pointing pointer" in Windows since IE
        * is the likely case that doesn't support canvas.
        */
-    $("<span>&#9658;</span>").addClass('widget').css({'height':triheight,'width':10}).prependTo(item);
+      $("<span>&#9658;</span>").addClass('widget').css({'height':triheight,'width':10}).prependTo(item);
     }
 
     $('.widget').bind('click', function(event){
