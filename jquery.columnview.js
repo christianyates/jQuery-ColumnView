@@ -43,6 +43,7 @@
       $(this).hide();
       // Reset the original list's id
       var origid = $(this).attr('id');
+
       if (origid) {
         $(this).attr('id', origid + "-processed");
       }
@@ -59,10 +60,14 @@
         var width = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
         $('.top').width(width);
       }
+
       $.each(top,function(i,item){
-        var topitem = $(':eq(0)',item).clone(true).wrapInner("<span/>").data('sub',$(item).children('ul')).appendTo(topdiv);
-        if (settings.fixedwidth || $.browser.msie)
+        var topitem = $(':eq(0)',item).clone(true).wrapInner("<span/>").
+          data('sub',$(item).children('ul'))
+          .appendTo(topdiv);
+        if (settings.fixedwidth || $.browser.msie) {
           $(topitem).css({'text-overflow':'ellipsis', '-o-text-overflow':'ellipsis','-ms-text-overflow':'ellipsis'});
+        }
         if($(topitem).data('sub').length) {
           $(topitem).addClass('hasChildMenu');
           addWidget(topitem);
@@ -204,15 +209,25 @@
     $.each($(container).children('div'),function(i,mydiv){
       leftPos += $(mydiv).width();
     });
+
     var submenu = $('<div/>').css({'top':0,'left':leftPos}).appendTo(container);
+
     // Set column width
-    if (width)
+    if (width) {
       $(submenu).width(width);
+    }
+
     var subitems = $(item).data('sub').children('li');
     $.each(subitems,function(i,subitem){
-      var subsubitem = $(':eq(0)',subitem).clone(true).wrapInner("<span/>").data('sub',$(subitem).children('ul')).appendTo(submenu);
-      if (width)
-        $(subsubitem).css({'text-overflow':'ellipsis', '-o-text-overflow':'ellipsis','-ms-text-overflow':'ellipsis'});
+      var subsubitem = $(':eq(0)',subitem).clone(true).wrapInner("<span/>")
+        .data('sub',$(subitem).children('ul'))
+        .appendTo(submenu);
+
+      if (width) {
+        $(subsubitem).css({'text-overflow':     'ellipsis',
+                           '-o-text-overflow':  'ellipsis',
+                           '-ms-text-overflow': 'ellipsis'} );
+      }
       if($(subsubitem).data('sub').length) {
         $(subsubitem).addClass('hasChildMenu');
         addWidget(subsubitem);
@@ -258,7 +273,6 @@
     });
   }
 
-  
   function addCSS() {
     // Add stylesheet, but only once
     if (!$('.containerobj').get(0)) {
