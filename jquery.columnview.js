@@ -23,11 +23,14 @@
 
   var settings;
 
-
   // Firefox doesn't repeat keydown events when the key is held, so we use
   // keypress with FF/Gecko/Mozilla to enable continuous keyboard scrolling.
   var key_event = $.browser.mozilla ? 'keypress' : 'keydown';
   
+  /* keep a reference to the container object in order to navigate from root */
+  var container;
+  var origElt;
+
   var methods = {
     init: function (options) {
       settings = $.extend({}, defaults, options);
@@ -44,10 +47,13 @@
         $(this).attr('id', origid + "-processed");
       }
 
+      origElt = $(this);
+
       // Create new top container from top-level LI tags
       var top = $(this).children('li');
-      var container = $('<div/>').addClass('containerobj').attr('id', origid).insertAfter(this);
+      container = $('<div/>').addClass('containerobj').attr('id', origid).insertAfter(this);
       var topdiv = $('<div class="top"></div>').appendTo(container);
+
       // Set column width
       if (settings.fixedwidth || $.browser.msie) { // MSIE doesn't support auto-width
         var width = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
@@ -66,8 +72,8 @@
       $(container).bind("click " + key_event, methods.handleEvent);
     },
 
-    handleClick: function (event, self) {
-      var container = $(self).parents('.containerobj');
+    handleClick: function (self, shiftKey, metaKey) {
+      $(self).focus();
       
       var level = $('div',container).index($(self).parents('div'));
       var isleafnode = false;
