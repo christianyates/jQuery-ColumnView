@@ -14,63 +14,7 @@
 (function($){
   var settings;
 
-    // Add stylesheet, but only once
-    if(!$('.containerobj').get(0)){
-      $('head').prepend('\
-      <style type="text/css" media="screen">\
-        .containerobj {\
-          border: 1px solid #ccc;\
-          height:5em;\
-          overflow-x:auto;\
-          overflow-y:hidden;\
-          white-space:nowrap;\
-          position:relative;\
-        }\
-        .containerobj div {\
-          height:100%;\
-          overflow-y:scroll;\
-          overflow-x:hidden;\
-          position:absolute;\
-        }\
-        .containerobj a {\
-          display:block;\
-          white-space:nowrap;\
-          clear:both;\
-          padding-right:15px;\
-          overflow:hidden;\
-          text-decoration:none;\
-        }\
-        .containerobj a:focus {\
-          outline:none;\
-        }\
-        .containerobj a canvas {\
-        }\
-        .containerobj .feature {\
-          min-width:200px;\
-          overflow-y:auto;\
-        }\
-        .containerobj .feature a {\
-          white-space:normal;\
-        }\
-        .containerobj .hasChildMenu {\
-        }\
-        .containerobj .active {\
-          background-color:#3671cf;\
-          color:#fff;\
-        }\
-        .containerobj .inpath {\
-          background-color:#d0d0d0;\
-          color:#000;\
-        }\
-        .containerobj .hasChildMenu .widget {\
-          color:black;\
-          position:absolute;\
-          right:0;\
-          text-decoration:none;\
-          font-size:0.7em;\
-        }\
-      </style>');
-    }
+
   // Firefox doesn't repeat keydown events when the key is held, so we use
   // keypress with FF/Gecko/Mozilla to enable continuous keyboard scrolling.
   var key_event = $.browser.mozilla ? 'keypress' : 'keydown';
@@ -78,6 +22,7 @@
   var methods = {
     init: function (options) {
       settings = $.extend({}, $.fn.columnview.defaults, options);
+        addCSS();
 
       // Hide original list
       $(this).hide();
@@ -286,4 +231,66 @@
       event.preventDefault();
     });
   }
+
+  
+  function addCSS() {
+    // Add stylesheet, but only once
+    if (!$('.containerobj').get(0)) {
+      $('head').prepend('\
+      <style type="text/css" media="screen">\
+        .containerobj {\
+          border: 1px solid #ccc;\
+          height:5em;\
+          overflow-x:auto;\
+          overflow-y:hidden;\
+          white-space:nowrap;\
+          position:relative;\
+        }\
+        .containerobj div {\
+          height:100%;\
+          overflow-y:scroll;\
+          overflow-x:hidden;\
+          position:absolute;\
+        }\
+        .containerobj a {\
+          display:block;\
+          white-space:nowrap;\
+          clear:both;\
+          padding-right:15px;\
+          overflow:hidden;\
+          text-decoration:none;\
+        }\
+        .containerobj a:focus {\
+          outline:none;\
+        }\
+        .containerobj a canvas {\
+        }\
+        .containerobj .feature {\
+          min-width:200px;\
+          overflow-y:auto;\
+        }\
+        .containerobj .feature a {\
+          white-space:normal;\
+        }\
+        .containerobj .hasChildMenu {\
+        }\
+        .containerobj .active {\
+          background-color:#3671cf;\
+          color:#fff;\
+        }\
+        .containerobj .inpath {\
+          background-color:#d0d0d0;\
+          color:#000;\
+        }\
+        .containerobj .hasChildMenu .widget {\
+          color:black;\
+          position:absolute;\
+          right:0;\
+          text-decoration:none;\
+          font-size:0.7em;\
+        }\
+      </style>');
+    }
+  }
+    
 })(jQuery);
