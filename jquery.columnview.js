@@ -80,28 +80,30 @@
       // Remove blocks to the right in the tree, and 'deactivate' other
       // links within the same level, if metakey is not being used
       $('div:gt('+level+')',container).remove();
-      if (!event.metaKey && !event.shiftKey) {
-        $('div:eq('+level+') a',container).removeClass('active').removeClass('inpath');
+      if (!metaKey && !shiftKey) {
+        $('div:eq('+level+') a',container).removeClass('active')
+          .removeClass('inpath');
         $('.active',container).addClass('inpath');
         $('div:lt('+level+') a',container).removeClass('active');
       }
+
       // Select intermediate items when shift clicking
       // Sorry, only works with jQuery 1.4 due to changes in the .index() function
-      if (event.shiftKey) {
+      if (shiftKey) {
         var first = $('a.active:first', $(self).parent()).index();
         var cur = $(self).index();
         var range = [first,cur].sort(function(a,b){return a - b;});
         $('div:eq('+level+') a', container).slice(range[0], range[1]).addClass('active');
       }
+
       $(self).addClass('active');
-      if ($(self).data('sub').children('li').length && !event.metaKey) {
+      if ($(self).data('sub').children('li').length && !metaKey) {
         // Menu has children, so add another submenu
         var w = false;
         if (settings.fixedwidth || $.browser.msie)
           w = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
         submenu(container,self,w);
-      }
-      else if (!event.metaKey && !event.shiftKey) {
+      } else if (!metaKey && !shiftKey) {
         // No children, show title instead (if it exists, or a link)
         isleafnode = true;
         var previewcontainer = $('<div/>').addClass('feature').appendTo(container);
@@ -154,7 +156,7 @@
         
         // Handle clicks
         if (event.type == "click") {
-          methods.handleClick(event, self);
+          methods.handleClick(self, event.shiftKey, event.metaKey);
         }
         
         // Handle Keyboard navigation
