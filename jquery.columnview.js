@@ -18,7 +18,8 @@
     fixedwidth: false, // Use fixed width columns
     onchange:   false, // Handler for selection change
     addCSS:     true,
-    useCanvas:  true
+    useCanvas:  true,
+    ondblclick: false  // callback for dblclick
   };
 
   var settings;
@@ -74,7 +75,7 @@
         }
       });
 
-      $(container).bind("click " + key_event, methods.handleEvent);
+      $(container).bind("click dblclick " + key_event, methods.handleEvent);
     },
 
     handleClick: function (self, shiftKey, metaKey) {
@@ -172,6 +173,18 @@
         }
 
         self.focus();
+
+        if (event.type == "dblclick") {
+          var isleafnode = false;
+          if (!$(self).data('sub').children('li').length) {
+            isleafnode = true;
+          }
+
+          if ($.isFunction(settings.ondblclick)) {
+            // We're passing the element back to the callback
+            var onchange = settings.ondblclick($(self), isleafnode);
+          }
+        }
 
         // Handle clicks
         if (event.type == "click") {
