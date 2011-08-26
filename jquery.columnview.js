@@ -5,6 +5,9 @@
  * http://christianyates.com
  * Copyright 2009 Christian Yates and ASU Mars Space Flight Facility. All rights reserved.
  *
+ * Modified by Manuel Odendahl <wesen@ruinwesen.com>
+ * August 2011
+ *
  * Supported under jQuery 1.2.x or later
  * Keyboard navigation supported under 1.3.x or later
  *
@@ -17,11 +20,12 @@
     preview:    true,  // Handler for preview pane
     fixedwidth: false, // Use fixed width columns
     onchange:   false, // Handler for selection change
-    addCSS:     true,
-    useCanvas:  true,
+    addCSS:     true,  // enable to have columnview automatically insert its CSS
+    useCanvas:  true,  // enable to have columnview generate a canvas arrow to indicate subcategories
     ondblclick: false  // callback for dblclick
   };
 
+  // store setting outside the closure.
   var settings;
 
   // Firefox doesn't repeat keydown events when the key is held, so we use
@@ -62,6 +66,7 @@
         $('.top').width(width);
       }
 
+      /* create the first column */
       $.each(top,function(i, item){
         var topitem = $(':eq(0)',item).clone(true).wrapInner("<span/>").
           data('sub',$(item).children('ul'))
@@ -75,14 +80,21 @@
         }
       });
 
+      /* bind events on the newly created column entries */
       $(container).bind("click dblclick " + key_event, methods.handleEvent);
     },
 
+    /**
+     * Handle a click event on an item inside the menu.
+     *
+     * Pass shiftKey and metaKey for multiple selection purposes.
+     **/
     handleClick: function (self, shiftKey, metaKey) {
       $(self).focus();
 
       var level = $('div',container).index($(self).parents('div'));
       var isleafnode = false;
+
       // Remove blocks to the right in the tree, and 'deactivate' other
       // links within the same level, if metakey is not being used
       $('div:gt('+level+')',container).remove();
@@ -103,6 +115,7 @@
       }
 
       $(self).addClass('active');
+
       if ($(self).data('sub').children('li').length && !metaKey) {
         // Menu has children, so add another submenu
         var w = false;
@@ -143,6 +156,16 @@
       }
     },
 
+    /**
+     * Navigate to an item with attrName = key.
+     *
+     * attrName is "name" by default.
+     *
+     * This looks up the item in the original list, and clicks its way
+     * through the parents to reach it (it will thus call onchange on
+     * the intermediate items, just as if the user navigated to it).
+     *
+     **/
     navigateTo: function (key, attrName) {
       if (!attrName) {
         attrName = "name";
@@ -156,7 +179,7 @@
         methods.handleClick(entry);
       });
     },
-    
+
     // Event handling functions
     handleEvent: function (event) {
       if ($(event.target).is("a,span")) {
@@ -219,7 +242,15 @@
     }
   };
 
-
+  /**
+   * Dispatcher method for the jQuery plugin. Call without arguments
+   * or options to call the initializer, or pass a method name and
+   * arguments:
+   *
+   * $(elt).columnview();
+   * $(elt).columnview('navigateTo', 'foobar');
+   *
+   **/
   $.fn.columnview = function(method) {
     if ( methods[method] ) {
       return methods[ method ].apply( this, Array.prototype.slice.call( arguments, 1 ));
