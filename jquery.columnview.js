@@ -56,8 +56,6 @@
         settings.getSubtree = getSubtree;
       }
 
-      debugLog(settings.getSubtree);
-
       if (settings.addCSS) {
         addCSS();
       }
