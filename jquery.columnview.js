@@ -6,7 +6,7 @@
  * Copyright 2009 Christian Yates and ASU Mars Space Flight Facility. All rights reserved.
  *
  * Modified by Manuel Odendahl <wesen@ruinwesen.com>
- * August 2011
+ * August - September 2011
  *
  * Supported under jQuery 1.2.x or later
  * Keyboard navigation supported under 1.3.x or later
@@ -19,10 +19,11 @@
     multi:      false, // Allow multiple selections
     preview:    true,  // Handler for preview pane
     fixedwidth: false, // Use fixed width columns
-    onchange:   false, // Handler for selection change
     addCSS:     true,  // enable to have columnview automatically insert its CSS
     useCanvas:  true,  // enable to have columnview generate a canvas arrow to indicate subcategories
-    ondblclick: false  // callback for dblclick
+    onchange:   false, // Handler for selection change
+    ondblclick: false,  // callback for dblclick
+    getSubtree: undefined, // callback for getting new data
   };
 
   // store setting outside the closure.
@@ -36,9 +37,26 @@
   var container;
   var origElt;
 
+  var getSubtree = function (elt) {
+    var dfd = $.Deferred();
+    var children = $(elt).data("sub");
+    if (children) {
+      return children.children('li');
+    } else {
+      return $(elt).children('li');
+    }
+  };
+
   var methods = {
     init: function (options) {
       settings = $.extend({}, defaults, options);
+
+      /* fix order of declaration */
+      if (!settings.getSubtree) {
+        settings.getSubtree = getSubtree;
+      }
+
+      debugLog(settings.getSubtree);
 
       if (settings.addCSS) {
         addCSS();
@@ -46,39 +64,21 @@
 
       // Hide original list
       $(this).hide();
+
       // Reset the original list's id
       var origid = $(this).attr('id');
-
       if (origid) {
         $(this).attr('id', origid + "-processed");
       }
 
+      // store a reference to the original list
       origElt = $(this);
 
-      // Create new top container from top-level LI tags
-      var top       = $(this).children('li');
+      // Create new top container
       container = $('<div/>').addClass('containerobj').attr('id', origid).insertAfter(this);
       var topdiv    = $('<div class="top"></div>').appendTo(container);
 
-      // Set column width
-      if (settings.fixedwidth || $.browser.msie) { // MSIE doesn't support auto-width
-        var width = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
-        $('.top').width(width);
-      }
-
-      /* create the first column */
-      $.each(top,function(i, item){
-        var topitem = $(':eq(0)',item).clone(true).wrapInner("<span/>").
-          data('sub',$(item).children('ul'))
-          .appendTo(topdiv);
-        if (settings.fixedwidth || $.browser.msie) {
-          $(topitem).css({'text-overflow':'ellipsis', '-o-text-overflow':'ellipsis','-ms-text-overflow':'ellipsis'});
-        }
-        if($(topitem).data('sub').length) {
-          $(topitem).addClass('hasChildMenu');
-          addWidget(topitem);
-        }
-      });
+      submenu(container, origElt, topdiv);
 
       /* bind events on the newly created column entries */
       $(container).bind("click dblclick " + key_event, methods.handleEvent);
@@ -92,17 +92,18 @@
     handleClick: function (self, shiftKey, metaKey) {
       $(self).focus();
 
-      var level = $('div',container).index($(self).parents('div'));
+      var level = $('div', container).index($(self).parents('div'));
       var isleafnode = false;
 
       // Remove blocks to the right in the tree, and 'deactivate' other
       // links within the same level, if metakey is not being used
-      $('div:gt('+level+')',container).remove();
+      $('div:gt('+level+')', container).remove();
       if (!metaKey && !shiftKey) {
-        $('div:eq('+level+') a',container).removeClass('active')
+        $('div:eq('+level+') a', container)
+          .removeClass('active')
           .removeClass('inpath');
-        $('.active',container)            .addClass('inpath');
-        $('div:lt('+level+') a',container).removeClass('active');
+        $('.active', container).addClass('inpath');
+        $('div:lt('+level+') a', container).removeClass('active');
       }
 
       // Select intermediate items when shift clicking
@@ -110,18 +111,16 @@
       if (shiftKey) {
         var first = $('a.active:first', $(self).parent()).index();
         var cur = $(self).index();
-        var range = [first,cur].sort(function(a,b){return a - b;});
+        var range = [first, cur].sort(function(a,b) { return a - b; });
         $('div:eq('+level+') a', container).slice(range[0], range[1]).addClass('active');
       }
 
       $(self).addClass('active');
 
+      /* get new children nodes */
       if ($(self).data('sub').children('li').length && !metaKey) {
         // Menu has children, so add another submenu
-        var w = false;
-        if (settings.fixedwidth || $.browser.msie)
-          w = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
-        submenu(container,self,w);
+        submenu(container, self);
       } else if (!metaKey && !shiftKey) {
         // No children, show title instead (if it exists, or a link)
         isleafnode = true;
@@ -216,22 +215,22 @@
 
         // Handle Keyboard navigation
         if(event.type == key_event){
-          switch(event.keyCode){
-          case(37): //left
+          switch (event.keyCode){
+          case (37): //left
             $(self).parent().prev().children('.inpath').focus().trigger("click");
             break;
-          case(38): //up
+          case (38): //up
             $(self).prev().focus().trigger("click");
             break;
-          case(39): //right
-            if($(self).hasClass('hasChildMenu')){
+          case (39): //right
+            if ($(self).hasClass('hasChildMenu')) {
               $(self).parent().next().children('a:first').focus().trigger("click");
             }
             break;
-          case(40): //down
+          case (40): //down
             $(self).next().focus().trigger("click");
             break;
-          case(13): //enter
+          case (13): //enter
             $(self).trigger("dblclick");
             break;
           }
@@ -262,35 +261,51 @@
   };
 
   // Generate deeper level menus
-  function submenu(container, item, width){
+  function submenu(container, node, submenu) {
+    var width = false;
+    if (settings.fixedwidth || $.browser.msie) {
+      width = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
+    }
+
     var leftPos = 0;
-    $.each($(container).children('div'),function(i,mydiv){
+    $.each($(container).children('div'), function(i, mydiv){
       leftPos += $(mydiv).width();
     });
 
-    var submenu = $('<div/>').css({'top':0,'left':leftPos}).appendTo(container);
+    if (!submenu) {
+      submenu = $('<div/>').css({'top':0, 'left':leftPos}).appendTo(container);
+    }
 
     // Set column width
     if (width) {
       $(submenu).width(width);
     }
 
-    var subitems = $(item).data('sub').children('li');
-    $.each(subitems,function(i,subitem){
-      var subsubitem = $(':eq(0)',subitem).clone(true).wrapInner("<span/>")
-        .data('sub',$(subitem).children('ul'))
-        .appendTo(submenu);
+    var appendItems = function (items) {
+        $.each(items, function(i, item) {
+          var subitem = $(':eq(0)', item)
+            .clone(true).wrapInner("<span/>")
+            .data('sub', $(item).children('ul'))
+            .appendTo(submenu);
 
-      if (width) {
-        $(subsubitem).css({'text-overflow':     'ellipsis',
-                           '-o-text-overflow':  'ellipsis',
-                           '-ms-text-overflow': 'ellipsis'} );
-      }
-      if ($(subsubitem).data('sub').length) {
-        $(subsubitem).addClass('hasChildMenu');
-        addWidget(subsubitem);
-      }
-    });
+          if (width) {
+            $(subitem).css({'text-overflow':     'ellipsis',
+                            '-o-text-overflow':  'ellipsis',
+                            '-ms-text-overflow': 'ellipsis'} );
+          }
+
+          if ($(subitem).data('sub').length || $(item).attr("hasChildren")) {
+            $(subitem).addClass('hasChildMenu');
+            addWidget(subitem);
+          }
+        });
+    };
+    var res = settings.getSubtree(node);
+    if (res && res.promise) {
+      res.promise().then(appendItems);
+    } else {
+      appendItems(res);
+    }
   }
 
   // Uses canvas, if available, to draw a triangle to denote that item is a parent
@@ -301,7 +316,12 @@
       useCss = true;
     } else {
       var triheight = $(item).height();
-      var canvas = $("<canvas></canvas>").attr({height:triheight,width:10}).addClass('widget').appendTo(item);    if(!color){ color = $(canvas).css('color'); }
+      var canvas = $("<canvas></canvas>").attr({height: triheight,
+                                                width:  10})
+        .addClass('widget').appendTo(item);
+      if (!color) {
+        color = $(canvas).css('color');
+      }
       canvas = $(canvas).get(0);
       if (canvas.getContext){
         var context = canvas.getContext('2d');
