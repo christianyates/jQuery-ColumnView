@@ -116,7 +116,7 @@
       $(self).addClass('active');
 
       /* get new children nodes */
-      if ($(self).data('sub').children('li').length && !metaKey) {
+      if ($(self).hasClass("hasChildMenu") && !metaKey) {
         // Menu has children, so add another submenu
         submenu(container, self);
       } else if (!metaKey && !shiftKey) {
@@ -196,7 +196,7 @@
 
         if (event.type == "dblclick") {
           var isleafnode = false;
-          if (!$(self).data('sub').children('li').length) {
+          if (!$(self).hasClass("hasChildMenu")) {
             isleafnode = true;
           }
 
@@ -298,7 +298,7 @@
           }
         });
     };
-    var res = settings.getSubtree(node);
+    var res = settings.getSubtree($(node));
     if (res && res.promise) {
       res.promise().then(appendItems);
     } else {
