@@ -133,7 +133,9 @@
         }
         // If no preview function is specificied, use a default behavior
         else {
-          var title = $('<a/>').attr({href:$(self).attr('href')}).text($(self).attr('title') ? $(self).attr('title') : $(self).text());
+          var title = $('<a/>')
+            .attr({href: $(self).attr('href')})
+            .text($(self).attr('title') ? $(self).attr('title') : $(self).text());
           $(previewcontainer).html(title);
         }
         // Set the width
@@ -143,14 +145,16 @@
         });
         var fillwidth = $(container).width() - remainingspace;
         $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();
+
+        // Fire onchange handler function, but only if multi-select is off.
+        // FIXME Need to deal multiple selections.
+        if ($.isFunction(settings.onchange) && !settings.multi) {
+          // We're passing the element back to the callback
+          var onchange = settings.onchange($(self), isleafnode);
+          $(container).trigger("columnview_change", $(self), isleafnode);
+        }
       }
 
-      // Fire onchange handler function, but only if multi-select is off.
-      // FIXME Need to deal multiple selections.
-      if ($.isFunction(settings.onchange) && !settings.multi) {
-        // We're passing the element back to the callback
-        var onchange = settings.onchange($(self), isleafnode);
-      }
     },
 
     /**
@@ -297,6 +301,14 @@
             addWidget(subitem);
           }
         });
+
+      /* trigger only after the data is added */
+      if ($.isFunction(settings.onchange) && !settings.multi) {
+        // We're passing the element back to the callback
+        var onchange = settings.onchange($(node), false);
+        $(container).trigger("columnview_change", $(node), false);
+      }
+
     };
     var res = settings.getSubtree($(node));
     if (res && res.promise) {
