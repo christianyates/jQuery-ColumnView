@@ -215,6 +215,22 @@
       $("div#demo-list > ul:first").clone(true).attr("id", "list10").appendTo("div#example10");
       $("ul#list10").columnview().bind('columnview_dblclick', function (ev, elt) { alert($(elt).text()); });
     </script>
+
+    <div id="example11">
+      <h2>Programmatically moving forward</h2>
+      <a id="navigateTo" href="#">Go to Create content</a><br/>
+    </div>
+
+    <script type="text/javascript">
+      $("div#demo-list > ul:first").clone(true).attr("id", "list11").appendTo("div#example11");
+      $("ul#list11").columnview();
+      $("a#navigateTo").bind("click",
+         function () {
+            var elt = $("ul#list11").columnview("container").find("a:eq(0)");
+            elt.trigger("click");
+            return false;
+         });
+    </script>
     
     
   </body>
