@@ -323,7 +323,7 @@
     }
 
     var appendItems = function (items) {
-      $.each(items, function(i, item) {
+      $.each($(items), function(i, item) {
         var $item = $(item);
         var $subitem = $(':eq(0)', $item)
           .clone(true)
@@ -331,6 +331,11 @@
           .data('sub', $item.children('ul'))
           .appendTo(submenu);
 
+        if (!$subitem.length) {
+          /* something went wrong with finding an inner item */
+          return;
+        }
+        
         if (width) {
           $subitem.css({'text-overflow':     'ellipsis',
                         '-o-text-overflow':  'ellipsis',
