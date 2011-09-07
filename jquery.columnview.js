@@ -89,6 +89,14 @@
       return $this;
     },
 
+    container: function () {
+      var data = $(this).data("columnview");
+      if (!data) {
+        return;
+      }
+      return data.container;
+    },
+
     /**
      * Handle a click event on an item inside the menu.
      *
@@ -139,6 +147,8 @@
         if ($self.hasClass("hasChildMenu")) {
           // Menu has children, so add another submenu
           submenu(container, $self);
+          /* triggering will happen in submenu */
+          return;
         } else {
           // No children, show title instead (if it exists, or a link)
           var previewcontainer = $('<div/>').addClass('feature').appendTo(container);
