@@ -162,13 +162,10 @@
         });
         var fillwidth = $(container).width() - remainingspace;
         $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();
-
-        // Fire onchange handler function, but only if multi-select is off.
-        // FIXME Need to deal multiple selections.
-        if (!settings.multi) {
-          $(container).trigger("columnview_change", [$self, isleafnode]);
         }
       }
+
+      origElt.trigger("columnview_select", [container.find(".active")]);
     },
 
     /**
@@ -240,12 +237,7 @@
         $self.focus();
 
         if (event.type == "dblclick") {
-          var isleafnode = false;
-          if (!$self.hasClass("hasChildMenu")) {
-            isleafnode = true;
-          }
-
-          $(container).trigger("columnview_dblclick", [$self, isleafnode]);
+          origElt.trigger("columnview_dblclick", [$self]);
         }
 
         // Handle clicks
@@ -349,8 +341,8 @@
         }
       });
 
-      /* trigger only after the data is added */
-      $(container).trigger("columnview_change", [$(node), false]);
+      /* trigger only after the data is added, not in handleEvent as there could be a deferred in between */
+      origElt.trigger("columnview_select", [$(node)]);
     };
 
     var res = settings.getSubtree($(node), $(node).attr("id") == $(origElt).attr("id"));
