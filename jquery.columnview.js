@@ -86,7 +86,7 @@
       $container.bind("click dblclick " + key_event, methods.handleEvent);
       
       
-      return $container;
+      return $this;
     },
 
     /**
