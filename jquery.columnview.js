@@ -86,7 +86,7 @@
       $container.bind("click dblclick " + key_event, methods.handleEvent);
       
       
-      return $container;
+      return $this;
     },
 
     /**
@@ -108,67 +108,66 @@
       $self.focus();
 
       var level = $('div', container).index($self.parents('div'));
-      var isleafnode = false;
-
       // Remove blocks to the right in the tree, and 'deactivate' other
       // links within the same level, if metakey is not being used
       $('div:gt('+level+')', container).remove();
-      if (!metaKey && !shiftKey) {
+      
+      if (metaKey) {
+        /* on meta key, toggle selections, and remove nothing */
+        if ($self.hasClass('active')) {
+          $self.removeClass('active');
+        } else {
+          $self.addClass('active');
+        }
+      } else if (shiftKey) {
+        // Select intermediate items when shift clicking
+        // Sorry, only works with jQuery 1.4 due to changes in the .index() function
+        var first = $('a.active:first', $self.parent()).index();
+        var cur = $self.index();
+        var range = [first, cur].sort(function(a,b) { return a - b; });
+        $('div:eq('+level+') a', container).slice(range[0], range[1]).addClass('active');
+        $self.addClass('active');
+      } else {
         $('div:eq('+level+') a', container)
           .removeClass('active')
           .removeClass('inpath');
         $('.active', container).addClass('inpath');
         $('div:lt('+level+') a', container).removeClass('active');
-      }
 
-      // Select intermediate items when shift clicking
-      // Sorry, only works with jQuery 1.4 due to changes in the .index() function
-      if (shiftKey) {
-        var first = $('a.active:first', $self.parent()).index();
-        var cur = $self.index();
-        var range = [first, cur].sort(function(a,b) { return a - b; });
-        $('div:eq('+level+') a', container).slice(range[0], range[1]).addClass('active');
-      }
-
-      $self.addClass('active');
-
-      /* get new children nodes */
-      if ($self.hasClass("hasChildMenu") && !metaKey) {
-        // Menu has children, so add another submenu
-        submenu(container, $self);
-      } else if (!metaKey && !shiftKey) {
-        // No children, show title instead (if it exists, or a link)
-        isleafnode = true;
-        var previewcontainer = $('<div/>').addClass('feature').appendTo(container);
-        // Fire preview handler function
-        if ($.isFunction(settings.preview)) {
-          // We're passing the element back to the callback
-          var preview = settings.preview($self);
-        }
-        // If preview is specifically disabled, do nothing with the previewbox
-        else if (!settings.preview) {
-        }
-        // If no preview function is specificied, use a default behavior
-        else {
-          var title = $('<a/>')
-            .attr({href: $self.attr('href')})
-            .text($self.attr('title') ? $self.attr('title') : $self.text());
-          $(previewcontainer).html(title);
-        }
-        // Set the width
-        var remainingspace = 0;
-        $.each($(container).children('div').slice(0,-1),function(i,item){
-          remainingspace += $(item).width();
-        });
-        var fillwidth = $(container).width() - remainingspace;
-        $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();
-
-        // Fire onchange handler function, but only if multi-select is off.
-        // FIXME Need to deal multiple selections.
-        if (!settings.multi) {
-          $(container).trigger("columnview_change", [$self, isleafnode]);
+        $self.addClass('active');
+        
+        if ($self.hasClass("hasChildMenu")) {
+          // Menu has children, so add another submenu
+          submenu(container, $self);
+        } else {
+          // No children, show title instead (if it exists, or a link)
+          var previewcontainer = $('<div/>').addClass('feature').appendTo(container);
+          
+          // Fire preview handler function
+          if ($.isFunction(settings.preview)) {
+            // We're passing the element back to the callback
+            var preview = settings.preview($self);
+          } else if (!settings.preview) {
+            // If preview is specifically disabled, do nothing with the previewbox
+          } else {
+            // If no preview function is specificied, use a default behavior
+            var title = $('<a/>')
+              .attr({href: $self.attr('href')})
+              .text($self.attr('title') ? $self.attr('title') : $self.text());
+            $(previewcontainer).html(title);
+          }
+          
+          // Set the width
+          var remainingspace = 0;
+          $.each($(container).children('div').slice(0,-1),function(i,item){
+            remainingspace += $(item).width();
+          });
+          var fillwidth = $(container).width() - remainingspace;
+          $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();
         }
       }
+
+      origElt.trigger("columnview_select", [container.find(".active")]);
     },
 
     /**
@@ -240,12 +239,7 @@
         $self.focus();
 
         if (event.type == "dblclick") {
-          var isleafnode = false;
-          if (!$self.hasClass("hasChildMenu")) {
-            isleafnode = true;
-          }
-
-          $(container).trigger("columnview_dblclick", [$self, isleafnode]);
+          origElt.trigger("columnview_dblclick", [$self]);
         }
 
         // Handle clicks
@@ -349,8 +343,8 @@
         }
       });
 
-      /* trigger only after the data is added */
-      $(container).trigger("columnview_change", [$(node), false]);
+      /* trigger only after the data is added, not in handleEvent as there could be a deferred in between */
+      origElt.trigger("columnview_select", [$(node)]);
     };
 
     var res = settings.getSubtree($(node), $(node).attr("id") == $(origElt).attr("id"));
