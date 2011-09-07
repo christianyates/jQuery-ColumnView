@@ -19,6 +19,8 @@ newer because of its use of deferreds.
 
 ## Usage ##
 
+Check these examples out on the [jquery-columnview github page](http://wesen.github.com/jQuery-ColumnView/demo.html).
+
 ### Simple list ###
 
 Use a simple nested HTML list:
