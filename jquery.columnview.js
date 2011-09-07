@@ -8,7 +8,7 @@
  * Modified by Manuel Odendahl <wesen@ruinwesen.com>
  * August - September 2011
  *
- * Supported under jQuery 1.2.x or later
+ * Supported under jQuery 1.5.x or later
  * Keyboard navigation supported under 1.3.x or later
  *
  * Dual licensed under MIT and GPL.
@@ -16,13 +16,11 @@
 
 (function($){
   var defaults = {
-    multi:      false, // Allow multiple selections
-    preview:    true,  // Handler for preview pane
-    fixedwidth: false, // Use fixed width columns
-    addCSS:     true,  // enable to have columnview automatically insert its CSS
-    useCanvas:  true,  // enable to have columnview generate a canvas arrow to indicate subcategories
-    onchange:   false, // Handler for selection change
-    ondblclick: false,  // callback for dblclick
+    multi:      false,  // Allow multiple selections
+    preview:    true,   // Handler for preview pane
+    fixedwidth: false,  // Use fixed width columns
+    addCSS:     true,   // enable to have columnview automatically insert its CSS
+    useCanvas:  true,   // enable to have columnview generate a canvas arrow to indicate subcategories
     getSubtree: undefined, // callback for getting new data
   };
 
@@ -37,8 +35,10 @@
   var container;
   var origElt;
 
+  /**
+   * default subtree function, returns child elements of the original list.
+   **/
   var getSubtree = function (elt) {
-    var dfd = $.Deferred();
     var children = $(elt).data("sub");
     if (children) {
       return children.children('li');
@@ -76,10 +76,13 @@
       container = $('<div/>').addClass('containerobj').attr('id', origid).insertAfter(this);
       var topdiv    = $('<div class="top"></div>').appendTo(container);
 
+      /* populate the first column */
       submenu(container, origElt, topdiv);
 
       /* bind events on the newly created column entries */
       $(container).bind("click dblclick " + key_event, methods.handleEvent);
+
+      return $(container);
     },
 
     /**
@@ -88,9 +91,10 @@
      * Pass shiftKey and metaKey for multiple selection purposes.
      **/
     handleClick: function (self, shiftKey, metaKey) {
-      $(self).focus();
+      self = $(self);
+      self.focus();
 
-      var level = $('div', container).index($(self).parents('div'));
+      var level = $('div', container).index(self.parents('div'));
       var isleafnode = false;
 
       // Remove blocks to the right in the tree, and 'deactivate' other
@@ -107,16 +111,16 @@
       // Select intermediate items when shift clicking
       // Sorry, only works with jQuery 1.4 due to changes in the .index() function
       if (shiftKey) {
-        var first = $('a.active:first', $(self).parent()).index();
-        var cur = $(self).index();
+        var first = $('a.active:first', self.parent()).index();
+        var cur = self.index();
         var range = [first, cur].sort(function(a,b) { return a - b; });
         $('div:eq('+level+') a', container).slice(range[0], range[1]).addClass('active');
       }
 
-      $(self).addClass('active');
+      self.addClass('active');
 
       /* get new children nodes */
-      if ($(self).hasClass("hasChildMenu") && !metaKey) {
+      if (self.hasClass("hasChildMenu") && !metaKey) {
         // Menu has children, so add another submenu
         submenu(container, self);
       } else if (!metaKey && !shiftKey) {
@@ -126,7 +130,7 @@
         // Fire preview handler function
         if ($.isFunction(settings.preview)) {
           // We're passing the element back to the callback
-          var preview = settings.preview($(self));
+          var preview = settings.preview(self);
         }
         // If preview is specifically disabled, do nothing with the previewbox
         else if (!settings.preview) {
@@ -134,8 +138,8 @@
         // If no preview function is specificied, use a default behavior
         else {
           var title = $('<a/>')
-            .attr({href: $(self).attr('href')})
-            .text($(self).attr('title') ? $(self).attr('title') : $(self).text());
+            .attr({href: self.attr('href')})
+            .text(self.attr('title') ? self.attr('title') : self.text());
           $(previewcontainer).html(title);
         }
         // Set the width
@@ -148,13 +152,10 @@
 
         // Fire onchange handler function, but only if multi-select is off.
         // FIXME Need to deal multiple selections.
-        if ($.isFunction(settings.onchange) && !settings.multi) {
-          // We're passing the element back to the callback
-          var onchange = settings.onchange($(self), isleafnode);
-          $(container).trigger("columnview_change", $(self), isleafnode);
+        if (!settings.multi) {
+          $(container).trigger("columnview_change", [self, isleafnode]);
         }
       }
-
     },
 
     /**
@@ -188,7 +189,7 @@
           var self = $(event.target).parent();
         }
         else {
-          var self = event.target;
+          var self = $(event.target);
         }
 
         if (!settings.multi) {
@@ -200,14 +201,11 @@
 
         if (event.type == "dblclick") {
           var isleafnode = false;
-          if (!$(self).hasClass("hasChildMenu")) {
+          if (!self.hasClass("hasChildMenu")) {
             isleafnode = true;
           }
 
-          if ($.isFunction(settings.ondblclick)) {
-            // We're passing the element back to the callback
-            var onchange = settings.ondblclick($(self), isleafnode);
-          }
+          $(container).trigger("columnview_dblclick", [self, isleafnode]);
         }
 
         // Handle clicks
@@ -219,21 +217,21 @@
         if(event.type == key_event){
           switch (event.keyCode){
           case (37): //left
-            $(self).parent().prev().children('.inpath').focus().trigger("click");
+            self.parent().prev().children('.inpath').focus().trigger("click");
             break;
           case (38): //up
-            $(self).prev().focus().trigger("click");
+            self.prev().focus().trigger("click");
             break;
           case (39): //right
-            if ($(self).hasClass('hasChildMenu')) {
-              $(self).parent().next().children('a:first').focus().trigger("click");
+            if (self.hasClass('hasChildMenu')) {
+              self.parent().next().children('a:first').focus().trigger("click");
             }
             break;
           case (40): //down
-            $(self).next().focus().trigger("click");
+            self.next().focus().trigger("click");
             break;
           case (13): //enter
-            $(self).trigger("dblclick");
+            self.trigger("dblclick");
             break;
           }
         }
@@ -303,20 +301,23 @@
         });
 
       /* trigger only after the data is added */
-      if ($.isFunction(settings.onchange) && !settings.multi) {
-        // We're passing the element back to the callback
-        var onchange = settings.onchange($(node), false);
-        $(container).trigger("columnview_change", $(node), false);
-      }
-
+      $(container).trigger("columnview_change", [$(node), false]);
     };
+
     var res = settings.getSubtree($(node));
+    /* check if getSubtree returned a deferred promise. */
     if (res && res.promise) {
       res.promise().then(appendItems);
     } else {
       appendItems(res);
     }
   }
+
+  /***************************************************************************
+   *
+   * Graphics and CSS stuff
+   *
+   ***************************************************************************/
 
   // Uses canvas, if available, to draw a triangle to denote that item is a parent
   function addWidget(item, color){
