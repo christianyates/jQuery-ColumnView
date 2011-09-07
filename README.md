@@ -4,16 +4,19 @@ jQuery-ColumnView
 A simple script to transform a hierarchical HTML list into a Miller
 Column UI (AKA, Mac OS X Finder style, NeXT style column view).
 
+This plugin was expanded to include:
+- using custom events instead of callbacks
+- support a dblclick event
+- loading of additional content with a custom callback (for example to load subtrees using ajax)
+- navigating to a specific element
+- clicking on nodes programmatically
+- enabling/disabling adding CSS automatically
+
 Compatibility
 -------------
 
-The latest version of Columnview now supports jQuery version 1.2.x,
-1.3.x and 1.4.x. Additionally, keyboard navigation is now available on
-all browsers when using jQuery 1.3 or later. The Livequery plugin is
-no longer required, but keyboard navigation is not supported with
-jQuery 1.2 (at the moment).
-
-The plugin works fine with jQuery 1.6.2.
+The plugin works fine with jQuery 1.6.2. It requires jQuery 1.5.x or
+newer because of its use of deferreds.
 
 Usage
 -----
