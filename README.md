@@ -16,3 +16,5 @@ See demo.html for examples of usage.
 Ongoing Debate
 --------------
 Keep track of comments by non-github users at [my blog](http://christianyates.com/blog/jquery/finder-column-view-hierarchical-lists-jquery).
+
+Branch: 1.x
