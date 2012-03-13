@@ -97,7 +97,7 @@
       $(topitem).css({'text-overflow':'ellipsis', '-o-text-overflow':'ellipsis','-ms-text-overflow':'ellipsis'});
       if($(topitem).data('sub').length) {
         $(topitem).addClass('hasChildMenu');
-        addWidget(topitem);
+        addWidget(container, topitem);
       }
     });
 
@@ -232,13 +232,13 @@
       $(subsubitem).css({'text-overflow':'ellipsis', '-o-text-overflow':'ellipsis','-ms-text-overflow':'ellipsis'});
       if($(subsubitem).data('sub').length) {
         $(subsubitem).addClass('hasChildMenu');
-        addWidget(subsubitem);
+        addWidget(container, subsubitem);
       }
     });
   }
 
   // Uses canvas, if available, to draw a triangle to denote that item is a parent
-  function addWidget(item, color){
+  function addWidget(container, item, color){
     var triheight = $(item).height();
     var canvas = $("<canvas></canvas>").attr({height:triheight,width:10}).addClass('widget').appendTo(item);    if(!color){ color = $(canvas).css('color'); }
     canvas = $(canvas).get(0);
@@ -259,7 +259,7 @@
        */
       $("<span>&#9658;</span>").addClass('widget').css({'height':triheight,'width':10}).prependTo(item);
     }
-    $('.widget').bind('click', function(event){
+    $(container).find('.widget').bind('click', function(event){
       event.preventDefault();
     });
 
