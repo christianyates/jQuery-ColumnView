@@ -22,7 +22,7 @@ jQuery.fn.mapAttributes = function(prefix) {
 		maps.push(map);
 	});
 	return (maps.length > 1 ? maps : maps[0]);
-}
+};
 
 
 /**
