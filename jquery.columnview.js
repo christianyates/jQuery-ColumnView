@@ -1,3 +1,30 @@
+/*!
+ * mapAttributes jQuery Plugin v1.0.0
+ *
+ * Copyright 2010, Michael Riddle
+ * Licensed under the MIT
+ * http://jquery.org/license
+ *
+ * Date: Sun Mar 28 05:49:39 2010 -0900
+ */
+
+jQuery.fn.mapAttributes = function(prefix) {
+	var maps = [];
+	$(this).each(function() {
+		var map = {};
+		for(var key in this.attributes) {
+			if(!isNaN(key)) {
+				if(!prefix || this.attributes[key].name.substr(0,prefix.length) == prefix) {
+					map[this.attributes[key].name] = this.attributes[key].value;
+				}
+			}
+		}
+		maps.push(map);
+	});
+	return (maps.length > 1 ? maps : maps[0]);
+}
+
+
 /**
  * jquery.columnview-1.3.js
  *
@@ -6,6 +33,7 @@
  *
  * Copyright 2009 Christian Yates and ASU Mars Space Flight Facility. All rights reserved.
  * Copyright 2011 Manuel Odendahl <wesen@ruinwesen.com>
+ * Copyright 2012 James Roberts <feedthefire@gmail.com>
  *
  * Supported under jQuery 1.5.x or later
  *
@@ -22,7 +50,6 @@
     useCanvas:  true,		// enable to have columnview generate a canvas arrow to indicate subcategories
 	attrs: [],				// attributes to pull from original items
 	autoFocus: true,		// focus to column onclick
-    preview: true,			// show preview pane
     getSubtree: undefined,	// callback for getting new data
     onChange:	undefined	// callback for onclick
   };
