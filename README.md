@@ -6,7 +6,7 @@ A simple script to transform a hierarchical HTML list into a Miller Column UI (A
 Compatibility
 -------------
 
-The latest version of Columnview now supports jQuery version 1.2.x, 1.3.x and 1.4.x. Additionally, keyboard navigation is now available on all browsers when using jQuery 1.3 or later. The Livequery plugin is no longer required, but keyboard navigation is not supported with jQuery 1.2 (at the moment).
+The latest version of Columnview now supports jQuery version 1.5.x.
 
 Usage
 -----
