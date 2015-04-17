@@ -263,6 +263,13 @@ jQuery.fn.mapAttributes = function(prefix) {
 
       if ($target.is("a,span")) {
         if ($target.is("span")){
+	  /** 
+	  * Retrieve the master <span> for strucure like:
+	  * <span class='label'><span class="code">...</span> - <span class="text">...</span></span>
+	  */
+          while($target.parent().is('span')) {
+            $target = $target.parent();
+          }
           $self = $target.parent();
         }
         else {
