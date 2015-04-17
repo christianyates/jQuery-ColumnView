@@ -201,7 +201,8 @@ jQuery.fn.mapAttributes = function(prefix) {
             remainingspace += $(item).width();
           });
           var fillwidth = $(container).width() - remainingspace;
-          $(previewcontainer).css({'top':0,'left':remainingspace}).width(fillwidth).show();
+	  var topPos = parseInt(container.css('paddingTop'));
+          $(previewcontainer).css({'top':topPos,'left':remainingspace}).width(fillwidth).show();
         }
       }
 
@@ -350,13 +351,14 @@ jQuery.fn.mapAttributes = function(prefix) {
       width = typeof settings.fixedwidth == "string" ? settings.fixedwidth : '200px';
     }
 
-    var leftPos = 0;
+    var topPos = parseInt(container.css('paddingTop'));
+    var leftPos = parseInt(container.css('paddingLeft'));
     $.each($(container).children('div'), function(i, mydiv){
-      leftPos += $(mydiv).width();
+      leftPos += $(mydiv).outerWidth();
     });
 
     if (!submenu) {
-      submenu = $('<div/>').css({'top':0, 'left':leftPos}).appendTo(container);
+      submenu = $('<div/>').css({'top':topPos, 'left':leftPos}).appendTo(container);
     }
 
     // Set column width
